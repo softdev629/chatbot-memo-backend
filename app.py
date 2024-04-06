@@ -1,18 +1,16 @@
 import os
-from flask import Flask, request, make_response
+from flask import Flask, request
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 from PyPDF2 import PdfReader
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
-from langchain.llms import OpenAI
+from langchain_openai import OpenAI
 from langchain.docstore.document import Document
 from dotenv import load_dotenv
-
-import pickle
 
 load_dotenv()
 
@@ -25,7 +23,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff")
 if os.path.exists("./store/index.faiss"):
-    docsearch = FAISS.load_local("./store", OpenAIEmbeddings())
+    docsearch = FAISS.load_local("./store", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
 else:
     docsearch = FAISS.from_documents([Document(page_content="This is ZK-Rollup Crypto Info Data.\n\n")], OpenAIEmbeddings())
 
@@ -54,7 +52,7 @@ def upload():
         texts = text_splitter.split_text(raw_text)
 
         if os.path.exists("./store/index.faiss"):
-            docsearch = FAISS.load_local("./store", OpenAIEmbeddings())
+            docsearch = FAISS.load_local("./store", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
             for text in texts:
                 docsearch.add_documents([Document(page_content=text)])
         else:

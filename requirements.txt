@@ -1,4 +1,5 @@
 langchain
+langchain-openai
 flask
 flask_cors
 faiss-cpu
@@ -6,3 +7,4 @@ openai
 PyPDF2
 python-dotenv
 pandas
+werkzeug==0.10.4
